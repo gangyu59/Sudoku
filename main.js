@@ -4,8 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const difficultySlider = document.getElementById('difficulty-slider');
     const difficultyLabel = document.getElementById('difficulty-label');
     const messageDiv = document.getElementById('message');
+    const errorCounter = document.getElementById('error-counter');
 
     let originalBoard = [];
+    let errorCount = 0;
 
     const difficulties = ['超易', '容易', '中等', '较难', '超难'];
 
@@ -15,10 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startButton.addEventListener('click', () => {
         const level = parseInt(difficultySlider.value);
-        messageDiv.textContent = '';
-        const board = generateSudoku(level);
-        originalBoard = JSON.parse(JSON.stringify(board));
-        displaySudoku(board);
+        messageDiv.textContent = '加载中...';
+        setTimeout(() => {
+            const board = generateSudoku(level);
+            originalBoard = JSON.parse(JSON.stringify(board));
+            displaySudoku(board);
+            messageDiv.textContent = '';
+        }, 100); // 加入短暂延时以显示“加载中...”文本
     });
 
     function displaySudoku(board) {
@@ -59,6 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             input.style.backgroundColor = 'red';
+            errorCount++;
+            errorCounter.textContent = `错误次数 = ${errorCount}`;
             setTimeout(() => {
                 input.style.backgroundColor = '';
                 input.value = '';
@@ -70,15 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let x = 0; x < 9; x++) {
             if (board[row][x] === num || board[x][col] === num) {
                 return false;
-            }
-        }
-        const startRow = Math.floor(row / 3) * 3;
-        const startCol = Math.floor(col / 3) * 3;
-        for (let r = startRow; r < startRow + 3; r++) {
-            for (let c = startCol; c < startCol + 3; c++) {
-                if (board[r][c] === num) {
-                    return false;
-                }
             }
         }
         return true;
@@ -98,6 +96,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function generateSudoku(level) {
         const base = 3;
         const side = base * base;
+        const timeout = 10000; // 10 seconds timeout
+        const startTime = new Date().getTime();
 
         function pattern(r, c) {
             return (base * (r % base) + Math.floor(r / base) + c) % side;
@@ -111,12 +111,27 @@ document.addEventListener('DOMContentLoaded', () => {
             return array;
         }
 
-        const rBase = [...Array(base).keys()];
-        const rows = shuffle(rBase.flatMap(g => shuffle(rBase).map(r => g * base + r)));
-        const cols = shuffle(rBase.flatMap(g => shuffle(rBase).map(c => g * base + c)));
-        const nums = shuffle([...Array(side).keys()].map(n => n + 1));
+        function fillBoard(board) {
+            for (let i = 0; i < side; i++) {
+                for (let j = 0; j < side; j++) {
+                    board[i][j] = 0;
+                }
+            }
+            for (let i = 0; i < side; i++) {
+                let num = 1;
+                for (let j = 0; j < side; j++) {
+                    while (!isValidMove(board, i, j, num)) {
+                        num++;
+                        if (num > side) num = 1;
+                    }
+                    board[i][j] = num;
+                }
+            }
+            return board;
+        }
 
-        const board = rows.map(row => cols.map(col => nums[pattern(row, col)]));
+        const board = Array.from({ length: side }, () => Array(side).fill(0));
+        fillBoard(board);
 
         const minEmpty = level * 10;
         const maxEmpty = level * 15;
@@ -131,37 +146,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 col = Math.floor(Math.random() * side);
             } while (board[row][col] === 0);
             board[row][col] = 0;
-        }
 
-        if (!isValidSudoku(board)) {
-            return generateSudoku(level);
-        }
-
-        return board;
-    }
-
-    function isValidSudoku(board) {
-        const rows = new Set();
-        const cols = new Set();
-        const boxes = new Set();
-
-        for (let r = 0; r < 9; r++) {
-            for (let c = 0; c < 9; c++) {
-                if (board[r][c] === 0) continue;
-
-                const val = board[r][c];
-                const boxIndex = Math.floor(r / 3) * 3 + Math.floor(c / 3);
-
-                if (rows.has(`${r}-${val}`) || cols.has(`${c}-${val}`) || boxes.has(`${boxIndex}-${val}`)) {
-                    return false;
-                }
-
-                rows.add(`${r}-${val}`);
-                cols.add(`${c}-${val}`);
-                boxes.add(`${boxIndex}-${val}`);
+            if (new Date().getTime() - startTime > timeout) {
+                alert('生成数独超时，请重试！');
+                return [];
             }
         }
 
-        return true;
+        return board;
     }
 });

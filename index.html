@@ -7,23 +7,54 @@
     <link rel="stylesheet" href="style.css">
     <script src="main.js" defer></script>
     <link rel="manifest" href="manifest.json">
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
-            .then(() => console.log('Service Worker Registered'))
-            .catch(error => console.error('Service Worker Registration failed:', error));
-        }
-    </script>
 </head>
 <body>
     <h1>Sudoku</h1>
+    <div id="error-counter">错误次数 = 0</div>
     <div id="sudoku-container">
         <!-- Sudoku grid or canvas -->
     </div>
-    <button id="start-button">开始</button>
-    <label for="difficulty-slider">难度：</label>
-    <input type="range" id="difficulty-slider" min="1" max="5" value="3">
-    <span id="difficulty-label">中等</span>
+    <div id="controls">
+        <label for="difficulty-slider">难度：
+            <span id="difficulty-label">中等</span>
+        </label>
+        <input type="range" id="difficulty-slider" class="slider" min="1" max="5" value="3">
+    </div>
+    <button id="start-button">开始</button><br>
+    <button id="rules-button">游戏规则</button>
     <div id="message"></div>
+
+    <div id="rules-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>游戏规则</h2>
+            <p>数独游戏是一种逻辑游戏，规则如下：</p>
+            <ul style="text-align: left;">
+                <li>在每个9x9的数独棋盘上填入数字1到9</li>
+                <li>每行、每列不能重复</li>
+                <li>通过逻辑推理填满整个棋盘</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById("rules-modal");
+        const btn = document.getElementById("rules-button");
+        const span = document.getElementsByClassName("close-button")[0];
+
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
 </body>
 </html>
