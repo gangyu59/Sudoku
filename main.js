@@ -79,6 +79,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 return false;
             }
         }
+        const startRow = Math.floor(row / 3) * 3;
+        const startCol = Math.floor(col / 3) * 3;
+        for (let r = 0; r < 3; r++) {
+            for (let c = 0; c < 3; c++) {
+                if (board[startRow + r][startCol + c] === num) {
+                    return false;
+                }
+            }
+        }
         return true;
     }
 
@@ -112,21 +121,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function fillBoard(board) {
+            const rows = Array.from({ length: side }, (_, i) => i);
+            const cols = Array.from({ length: side }, (_, i) => i);
+            const nums = Array.from({ length: side }, (_, i) => i + 1);
+
             for (let i = 0; i < side; i++) {
-                for (let j = 0; j < side; j++) {
-                    board[i][j] = 0;
-                }
+                board[i] = Array(side).fill(0);
             }
-            for (let i = 0; i < side; i++) {
-                let num = 1;
-                for (let j = 0; j < side; j++) {
-                    while (!isValidMove(board, i, j, num)) {
-                        num++;
-                        if (num > side) num = 1;
+
+            function fillCell(row, col) {
+                if (row === side) {
+                    return true;
+                }
+
+                const nextRow = col === side - 1 ? row + 1 : row;
+                const nextCol = col === side - 1 ? 0 : col + 1;
+
+                const shuffledNums = shuffle(nums.slice());
+                for (let num of shuffledNums) {
+                    if (isValidMove(board, row, col, num)) {
+                        board[row][col] = num;
+                        if (fillCell(nextRow, nextCol)) {
+                            return true;
+                        }
+                        board[row][col] = 0;
                     }
-                    board[i][j] = num;
                 }
+
+                return false;
             }
+
+            fillCell(0, 0);
             return board;
         }
 
