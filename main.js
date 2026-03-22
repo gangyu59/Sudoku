@@ -1,4 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Make grid square by matching height to measured width (fixes mobile aspect-ratio bugs)
+    function fixGridSize() {
+        const c = document.getElementById('sudoku-container');
+        c.style.height = c.offsetWidth + 'px';
+    }
+    window.addEventListener('resize', fixGridSize);
+    fixGridSize();
+
     const sudokuContainer = document.getElementById('sudoku-container');
     const startButton     = document.getElementById('start-button');
     const difficultySlider = document.getElementById('difficulty-slider');

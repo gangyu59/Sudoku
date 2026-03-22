@@ -115,7 +115,6 @@ h1 {
     border-radius: 6px;
     overflow: hidden;
     width: 100%;
-    aspect-ratio: 1;
     margin-bottom: 14px;
     box-shadow: 0 0 30px rgba(255, 180, 0, 0.2), 0 8px 32px rgba(0, 0, 0, 0.4);
 }
