@@ -122,7 +122,6 @@ h1 {
 
 /* Cell base */
 .cell {
-    aspect-ratio: 1;
     background: rgba(240, 245, 255, 0.93);
     border: 1px solid rgba(140, 160, 210, 0.4);
     display: flex;
