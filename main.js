@@ -106,15 +106,24 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleInput(event, row, col) {
         const input = event.target;
         const cell  = input.parentElement;
-        const value = input.value;
 
-        if (!/^[1-9]$/.test(value)) {
+        // Ignore input while error animation is running
+        if (cell.classList.contains('error')) {
             input.value = '';
             return;
         }
 
-        if (isValidMove(originalBoard, row, col, parseInt(value))) {
-            originalBoard[row][col] = parseInt(value);
+        // Extract only the last valid digit (handles IME/mobile composition)
+        const digit = input.value.replace(/[^1-9]/g, '').slice(-1);
+        if (!digit) {
+            input.value = '';
+            return;
+        }
+        input.value = digit;
+
+        if (isValidMove(originalBoard, row, col, parseInt(digit))) {
+            originalBoard[row][col] = parseInt(digit);
+            input.disabled = true;
 
             // Brief green flash
             cell.classList.add('correct-flash');
@@ -126,13 +135,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 messageDiv.className = 'msg-win';
             }
         } else {
+            input.value = ''; // Clear immediately so next input works
             cell.classList.add('error');
             errorCount++;
             errorCountEl.textContent = errorCount;
 
             setTimeout(() => {
                 cell.classList.remove('error');
-                input.value = '';
             }, 900);
         }
     }
