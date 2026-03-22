@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sudoku-cache-v2';
+const CACHE_NAME = 'sudoku-cache-v3';
 const urlsToCache = [
     './index.html',
     './style.css',
@@ -19,6 +19,7 @@ self.addEventListener('install', (event) => {
             .catch(error => {
                 console.error('Caching failed:', error);
             })
+            .then(() => self.skipWaiting())
     );
 });
 
@@ -48,6 +49,6 @@ self.addEventListener('activate', (event) => {
                     }
                 })
             );
-        })
+        }).then(() => self.clients.claim())
     );
 });
