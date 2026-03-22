@@ -109,10 +109,13 @@ h1 {
 #sudoku-container {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(9, 1fr);
     gap: 0;
     border: 3px solid rgba(255, 195, 30, 0.75);
     border-radius: 6px;
     overflow: hidden;
+    width: 100%;
+    aspect-ratio: 1;
     margin-bottom: 14px;
     box-shadow: 0 0 30px rgba(255, 180, 0, 0.2), 0 8px 32px rgba(0, 0, 0, 0.4);
 }
